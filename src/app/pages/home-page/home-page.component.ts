@@ -26,7 +26,7 @@ export class HomePageComponent implements OnInit {
   private readonly router = inject(Router);
   isAuthenticated = false;
   products: Array<Product> = [];
-  quantity = 1;
+  quantityIsNull = false;
   orderSuccess = false;
   orderFailed = false;
 
@@ -47,16 +47,33 @@ export class HomePageComponent implements OnInit {
     this.router.navigateByUrl('/add-product');
   }
 
-  orderProduct(product: Product) {
-    const order: Order = {
-      skuCode: product.skuCode,
-      price: product.price,
-      quantity: this.quantity,
-    }
-    this.orderService.orderProduct(order).subscribe(() => {
-      this.orderSuccess = true;
-    }, error => {
-      this.orderFailed = false;
+  orderProduct(product: Product, quantity: string) {
+
+    this.oidcSecurityService.userData$.subscribe(result => {
+      const userDetails = {
+        email: result.userData.email,
+        firstName: result.userData.firstName,
+        lastName: result.userData.lastName
+      };
+
+      if(!quantity) {
+        this.orderFailed = true;
+        this.orderSuccess = false;
+        this.quantityIsNull = true;
+      } else {
+        const order: Order = {
+          skuCode: product.skuCode,
+          price: product.price,
+          quantity: Number(quantity),
+          userDetails: userDetails
+        }
+
+        this.orderService.orderProduct(order).subscribe(() => {
+          this.orderSuccess = true;
+        }, error => {
+          this.orderFailed = false;
+        })
+      }
     })
   }
 }

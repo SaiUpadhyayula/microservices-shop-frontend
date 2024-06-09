@@ -14,6 +14,9 @@
         <h4 class="text-green-500 font-bold">Order Placed Successfully</h4>
       } @else if (orderFailed) {
         <h4 class="text-red-500 font-bold">Order Failed, please try again later</h4>
+        @if(quantityIsNull) {
+          <h4 class="text-red-500 font-bold">Quantity cannot be null</h4>
+        }
       }
       <ul class="list-disc list-inside">
         @for (product of products; track product.id) {
@@ -23,13 +26,14 @@
               <span class="text-gray-600">
                 Price: {{ product.price }}
               </span>
-              <!--              <br/>-->
-              <!--              <span >-->
-              <!--                Quantity: <input type="number" [(ngModel)]="quantity"/>-->
-              <!--              </span>-->
+              <br/>
+              <span >
+                Quantity: <input type="number" #quantityInput/>
+              </span>
+              <br/>
             </div>
             <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 ml-4"
-                    (click)="orderProduct(product)">
+                    (click)="orderProduct(product, quantityInput.value)">
               Order Now
             </button>
           </li>
